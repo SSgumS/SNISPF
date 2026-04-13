@@ -172,14 +172,15 @@ class RawInjector:
             return False
 
         # Find the interface
-        self.iface_idx = self._find_interface()
-        if self.iface_idx is None:
+        iface_info = self._find_interface()
+        if iface_info is None:
             logger.warning("Cannot determine outgoing interface for raw injection")
             self.raw_fd.close()
             self.raw_fd = None
             return False
+        self.iface_idx, self.iface_name = iface_info
 
-        self.raw_fd.bind(("", ETH_P_ALL))
+        self.raw_fd.bind((self.iface_name, ETH_P_ALL))
 
         self.running = True
         self._sniffer_thread = threading.Thread(
